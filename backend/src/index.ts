@@ -6,22 +6,23 @@ import { config } from './config';
 import { coverageRouter } from './routes/coverageRoutes';
 import { discountRouter } from './routes/discountRoutes';
 import { seedData } from './seed';
+import SERVER_MESSAGE from './constants/serverMessages';
 
 const app = express();
 
 mongoose
     .connect(config.mongo.url as string, { retryWrites: true, w: 'majority' })
     .then(() => {
-        console.log('Connected to MongoDB Atlas');
+        console.log(SERVER_MESSAGE.MONGO_ATLAS_CONNECTED);
         startServer(app, config.server.port);
     })
     .catch((err) => {
-        console.error('Database connection error', err);
+        console.error(SERVER_MESSAGE.DB_CONNECTION_ERROR, err);
     });
 
 const startServer = (app: Application, port: Number) => {
     app.listen(port, () => {
-        console.log(`Server running on port ${port}`);
+        console.log(`${SERVER_MESSAGE.SERVER_RUNNING_ON_PORT} ${port}`);
         seedData();
     });
 };
