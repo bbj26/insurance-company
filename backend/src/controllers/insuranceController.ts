@@ -3,6 +3,7 @@ import Coverage, { ICoverage } from '../models/Coverage';
 import Discount, { IDiscount } from '../models/Discount';
 import InsuranceSettings from '../models/InsuranceSettings'; // Step 1
 import { calculateCoverages, calculateDiscounts, applySurchargeForStrongCar } from '../helpers/insuranceCalculations';
+import HTTP_STATUS_CODE from '../constants/httpStatusCode';
 
 const calculateInsurance = async (req: Request, res: Response) => {
     try {
@@ -13,7 +14,7 @@ const calculateInsurance = async (req: Request, res: Response) => {
         // Check if insurance settings are available
         const insuranceSettings = await InsuranceSettings.findOne();
         if (!insuranceSettings) {
-            return res.status(500).json({ message: 'Insurance settings not found' });
+            return res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ message: 'Insurance settings not found' });
         }
 
         // Calculate base price using insurance settings
@@ -36,7 +37,7 @@ const calculateInsurance = async (req: Request, res: Response) => {
         // Calculate total price
         const totalPrice = (basePrice + totalCoverages - totalDiscounts - voucherDiscount).toFixed(2);
 
-        res.json({
+        res.status(HTTP_STATUS_CODE.SUCCESS).json({
             basePrice,
             coverages: selectedCoverages,
             discounts: selectedDiscounts,
@@ -44,7 +45,7 @@ const calculateInsurance = async (req: Request, res: Response) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error calculating insurance', error });
+        res.status(HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR).json({ message: 'Error calculating insurance', error });
     }
 };
 
