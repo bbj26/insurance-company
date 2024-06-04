@@ -1,0 +1,51 @@
+import { Request, Response } from 'express';
+import Coverage, { ICoverage } from '../models/Coverage';
+import Discount, { IDiscount } from '../models/Discount';
+import InsuranceSettings from '../models/InsuranceSettings'; // Step 1
+import { calculateCoverages, calculateDiscounts, applySurchargeForStrongCar } from '../helpers/insuranceCalculations';
+
+const calculateInsurance = async (req: Request, res: Response) => {
+    try {
+        const { name, birthdate, city, vehiclePower, voucher, selectedCoverages, selectedDiscounts } = req.body;
+
+        const age = new Date().getFullYear() - new Date(birthdate).getFullYear();
+
+        // Check if insurance settings are available
+        const insuranceSettings = await InsuranceSettings.findOne();
+        if (!insuranceSettings) {
+            return res.status(500).json({ message: 'Insurance settings not found' });
+        }
+
+        // Calculate base price using insurance settings
+        let basePrice = age > insuranceSettings.ageThreshold ? insuranceSettings.basePriceOld : insuranceSettings.basePriceYoung;
+
+        // Apply strong car surcharge
+        basePrice = applySurchargeForStrongCar(basePrice, vehiclePower, insuranceSettings);
+
+        // Retrieve coverages and discounts from the database
+        const coverages: ICoverage[] = await Coverage.find({ _id: { $in: selectedCoverages } });
+        const discounts: IDiscount[] = await Discount.find({ _id: { $in: selectedDiscounts } });
+
+        // Calculate total coverages and discounts
+        const totalCoverages = await calculateCoverages(coverages, basePrice, age, vehiclePower, insuranceSettings);
+        const totalDiscounts = await calculateDiscounts(discounts, basePrice, totalCoverages, vehiclePower, insuranceSettings);
+
+        // Apply voucher
+        const voucherDiscount = voucher ? parseFloat(voucher) : 0;
+
+        // Calculate total price
+        const totalPrice = (basePrice + totalCoverages - totalDiscounts - voucherDiscount).toFixed(2);
+
+        res.json({
+            basePrice,
+            coverages: selectedCoverages,
+            discounts: selectedDiscounts,
+            totalPrice
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error calculating insurance', error });
+    }
+};
+
+export { calculateInsurance };
