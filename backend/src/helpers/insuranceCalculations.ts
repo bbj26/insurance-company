@@ -39,9 +39,15 @@ export const calculateCoverages = async (selectedCoverages: ICoverage[], basePri
     return totalCoverages;
 };
 
-export const calculateDiscounts = async (selectedDiscounts: IDiscount[], basePrice: number, totalCoverages: number, vehiclePower: number, insuranceSettings: IInsuranceSettings): Promise<number> => {
+export const calculateDiscounts = async (
+    selectedDiscounts: IDiscount[],
+    basePrice: number,
+    totalCoverages: number,
+    vehiclePower: number,
+    insuranceSettings: IInsuranceSettings,
+    numberOfCoveragesSelected: number
+): Promise<number> => {
     let totalDiscounts = 0;
-
     for (const discount of selectedDiscounts) {
         const discountFromDB = await Discount.findById(discount._id);
         if (discountFromDB) {
@@ -51,7 +57,7 @@ export const calculateDiscounts = async (selectedDiscounts: IDiscount[], basePri
                     discountAmount = basePrice * discountFromDB.percentage;
                     break;
                 case DISCOUNT_ADVISER:
-                    if (selectedDiscounts.length >= 2) {
+                    if (numberOfCoveragesSelected >= 2) {
                         discountAmount = totalCoverages * discountFromDB.percentage;
                     }
                     break;

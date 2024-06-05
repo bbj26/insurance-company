@@ -35,7 +35,7 @@ const calculateInsurance = [
 
             // Calculate total coverages and discounts
             const totalCoverages = await calculateCoverages(coverages, basePrice, age, vehiclePower, insuranceSettings);
-            const totalDiscounts = await calculateDiscounts(discounts, basePrice, totalCoverages, vehiclePower, insuranceSettings);
+            const totalDiscounts = await calculateDiscounts(discounts, basePrice, totalCoverages, vehiclePower, insuranceSettings, coverages.length);
 
             // Apply voucher
             const voucherDiscount = voucher ? parseFloat(voucher) : 0;

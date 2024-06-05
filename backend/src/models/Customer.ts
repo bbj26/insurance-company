@@ -5,7 +5,7 @@ interface ICustomer extends Document {
     birthdate: Date;
     city: string;
     vehiclePower: number;
-    voucher?: string;
+    voucher?: number;
 }
 
 const customerSchema = new Schema<ICustomer>({
@@ -13,7 +13,7 @@ const customerSchema = new Schema<ICustomer>({
     birthdate: { type: Date, required: true },
     city: { type: String, required: true },
     vehiclePower: { type: Number, required: true },
-    voucher: { type: String }
+    voucher: { type: Number }
 });
 
 const Customer = model<ICustomer>('Customer', customerSchema);

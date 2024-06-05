@@ -1,6 +1,7 @@
 import express, { Application } from 'express';
 import mongoose from 'mongoose';
 import { json } from 'body-parser';
+import cors from 'cors';
 import { insuranceRouter } from './routes/insuranceRoutes';
 import { config } from './config';
 import { coverageRouter } from './routes/coverageRoutes';
@@ -9,6 +10,14 @@ import { seedData } from './seed';
 import SERVER_MESSAGE from './constants/serverMessages';
 
 const app = express();
+
+app.use(
+    cors({
+        origin: 'http://localhost:3000', // Replace with your frontend URL
+        methods: 'GET,POST,PUT,DELETE',
+        allowedHeaders: 'Content-Type,Authorization'
+    })
+);
 
 mongoose
     .connect(config.mongo.url as string, { retryWrites: true, w: 'majority' })
