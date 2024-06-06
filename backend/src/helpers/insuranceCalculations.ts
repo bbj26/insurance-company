@@ -3,7 +3,9 @@ import { IDiscount } from '../models/Discount';
 import { IInsuranceSettings } from '../models/InsuranceSettings';
 import Coverage from '../models/Coverage';
 import Discount from '../models/Discount';
-import { COVERAGE_AO_PLUS, COVERAGE_BONUS_PROTECTION, COVERAGE_GLASS_PROTECTION, DISCOUNT_ADVISER, DISCOUNT_COMMERCIAL, DISCOUNT_VIP } from '../constants/insurance';
+import { BASE_PRICE_OLD, BASE_PRICE_YOUNG, COVERAGE_AO_PLUS, COVERAGE_BONUS_PROTECTION, COVERAGE_GLASS_PROTECTION, DISCOUNT_ADVISER, DISCOUNT_COMMERCIAL, DISCOUNT_VIP } from '../constants/insurance';
+import BasePrice from '../models/BasePrice';
+import { ICustomer } from '../models/Customer';
 
 export const calculateCoverages = async (selectedCoverages: ICoverage[], basePrice: number, age: number, vehiclePower: number, insuranceSettings: IInsuranceSettings): Promise<number> => {
     let totalCoverages = 0;
@@ -77,5 +79,24 @@ export const applySurchargeForStrongCar = (basePrice: number, vehiclePower: numb
     if (vehiclePower > insuranceSettings.strongCarThreshold) {
         return basePrice * (1 + insuranceSettings.surchargePercentageStrongCar);
     }
+    return basePrice;
+};
+
+export const getBasePrices = async (city: string, age: number): Promise<number> => {
+    const records = await BasePrice.find({ city }).sort({ minAge: -1 }).exec();
+    const record = records.find((record) => age >= record.minAge);
+
+    if (record) {
+        return record.basePrice;
+    } else {
+        // if there's no given city in db, default to simple calculation based on age only
+        return age < 30 ? BASE_PRICE_YOUNG : BASE_PRICE_OLD;
+    }
+};
+
+export const calculateBasePrice = async (customerBirthdate: Date, customerCity: string): Promise<number> => {
+    const birthdate = new Date(customerBirthdate);
+    const age = new Date().getFullYear() - birthdate.getFullYear();
+    const basePrice = await getBasePrices(customerCity, age);
     return basePrice;
 };

@@ -1,6 +1,13 @@
-export const BASE_PRICE_YOUNG = 150;
-export const BASE_PRICE_OLD = 200;
-export const AGE_THRESHOLD = 30;
+export interface BasePriceRecord {
+    city: string;
+    minAge: number;
+    basePrice: number;
+}
+
+export const BASE_PRICE_YOUNG = 100;
+export const BASE_PRICE_OLD = 150;
+export const AGE_THRESHOLD_BOTTOM = 18;
+export const AGE_THRESHOLD_UP = 30;
 export const STRONG_CAR_THRESHOLD = 100;
 export const VIP_DISCOUNT_THRESHOLD = 80;
 
@@ -21,3 +28,14 @@ export const DISCOUNT_PERCENTAGE_COMMERCIAL = 0.1;
 export const DISCOUNT_PERCENTAGE_ADVISER = 0.2;
 export const DISCOUNT_PERCENTAGE_VIP = 0.05;
 export const SURCHARGE_PERCENTAGE_STRONG_CAR = 0.1;
+
+export const BASE_PRICE_RECORDS: BasePriceRecord[] = [
+    { city: 'Zagreb', minAge: AGE_THRESHOLD_BOTTOM, basePrice: 100 },
+    { city: 'Zagreb', minAge: AGE_THRESHOLD_UP, basePrice: 150 },
+    { city: 'Split', minAge: AGE_THRESHOLD_BOTTOM, basePrice: 110 },
+    { city: 'Split', minAge: AGE_THRESHOLD_UP, basePrice: 160 },
+    { city: 'Rijeka', minAge: AGE_THRESHOLD_BOTTOM, basePrice: 120 },
+    { city: 'Rijeka', minAge: AGE_THRESHOLD_UP, basePrice: 170 },
+    { city: 'Osijek', minAge: AGE_THRESHOLD_BOTTOM, basePrice: 130 },
+    { city: 'Split', minAge: AGE_THRESHOLD_UP, basePrice: 180 }
+];

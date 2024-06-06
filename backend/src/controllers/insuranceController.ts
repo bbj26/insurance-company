@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import Coverage, { ICoverage } from '../models/Coverage';
 import Discount, { IDiscount } from '../models/Discount';
 import InsuranceSettings from '../models/InsuranceSettings';
-import { calculateCoverages, calculateDiscounts, applySurchargeForStrongCar } from '../helpers/insuranceCalculations';
+import { calculateCoverages, calculateDiscounts, applySurchargeForStrongCar, calculateBasePrice } from '../helpers/insuranceCalculations';
 import HTTP_STATUS_CODE from '../constants/httpStatusCode';
 import SERVER_MESSAGE from '../constants/serverMessages';
 import { calculateInsuranceValidation } from '../validations/insuranceCalculationValidations';
@@ -24,7 +24,7 @@ const calculateInsurance = [
             }
 
             // Calculate base price using insurance settings
-            let basePrice = age > insuranceSettings.ageThreshold ? insuranceSettings.basePriceOld : insuranceSettings.basePriceYoung;
+            let basePrice = await calculateBasePrice(birthdate, city);
 
             // Apply strong car surcharge
             basePrice = applySurchargeForStrongCar(basePrice, vehiclePower, insuranceSettings);

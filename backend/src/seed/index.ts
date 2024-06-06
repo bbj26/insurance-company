@@ -4,8 +4,9 @@ import Discount from '../models/Discount';
 import { config } from '../config';
 import InsuranceSettings from '../models/InsuranceSettings';
 import {
-    AGE_THRESHOLD,
+    AGE_THRESHOLD_UP,
     BASE_PRICE_OLD,
+    BASE_PRICE_RECORDS,
     BASE_PRICE_YOUNG,
     COVERAGE_AO_PLUS,
     COVERAGE_BONUS_PROTECTION,
@@ -25,6 +26,7 @@ import {
     VIP_DISCOUNT_THRESHOLD
 } from '../constants/insurance';
 import SERVER_MESSAGE from '../constants/serverMessages';
+import BasePrice from '../models/BasePrice';
 
 export const seedData = async () => {
     try {
@@ -52,16 +54,19 @@ export const seedData = async () => {
         const insuranceSettingsData = {
             basePriceYoung: BASE_PRICE_YOUNG,
             basePriceOld: BASE_PRICE_OLD,
-            ageThreshold: AGE_THRESHOLD,
+            ageThreshold: AGE_THRESHOLD_UP,
             strongCarThreshold: STRONG_CAR_THRESHOLD,
             vipDiscountThreshold: VIP_DISCOUNT_THRESHOLD,
             surchargePercentageStrongCar: SURCHARGE_PERCENTAGE_STRONG_CAR
         };
 
-        // insert coverages, discounts and other insurance settings in db
+        const basePriceRecordsData = BASE_PRICE_RECORDS;
+
+        // insert coverages, discounts, base price records and other insurance settings in db
         await Coverage.insertMany(coveragesData);
         await Discount.insertMany(discountsData);
         await InsuranceSettings.create(insuranceSettingsData);
+        await BasePrice.insertMany(basePriceRecordsData);
 
         console.log(SERVER_MESSAGE.SEED_FINISH_SUCCESS);
     } catch (error) {
