@@ -15,7 +15,7 @@ const App: React.FC = () => {
     }, [dispatch]);
 
     return (
-        <div className="container p-4" style={{ border: '1px solid black' }}>
+        <div className="container p-4">
             <Header />
             <div className="row mt-4">
                 <div className="col-md-8">
@@ -24,6 +24,7 @@ const App: React.FC = () => {
                 <div className="col-md-4" style={{ backgroundColor: '#e6e6e6' }}>
                     <Sidebar />
                 </div>
+                <hr className="mt-4 mb-4" />
                 <PriceDetails />
             </div>
         </div>
