@@ -9,7 +9,7 @@ const PriceDetails: React.FC = () => {
         <div className="price-details mt-4">
             <h3>Price Details</h3>
             <div className="price-detail">
-                <h5>Basic Price:</h5> {basePrice} EUR
+                <h5>Basic Price: {basePrice} EUR</h5>
             </div>
             {Object.keys(discountAmounts).length > 0 && (
                 <div className="price-detail">
@@ -17,7 +17,7 @@ const PriceDetails: React.FC = () => {
                     <ul>
                         {Object.entries(discountAmounts).map(([discountName, amount]) => (
                             <li key={discountName}>
-                                {discountName}: {amount} EUR
+                                {discountName}: {amount.toFixed(2)} EUR
                             </li>
                         ))}
                     </ul>
@@ -29,14 +29,14 @@ const PriceDetails: React.FC = () => {
                     <ul>
                         {Object.entries(coverageAmounts).map(([coverageName, amount]) => (
                             <li key={coverageName}>
-                                {coverageName}: {amount} EUR
+                                {coverageName}: {amount.toFixed(2)} EUR
                             </li>
                         ))}
                     </ul>
                 </div>
             )}
             <div className="price-detail">
-                <strong>Total Price:</strong> {totalPrice} EUR
+                <h5>Total Price: {totalPrice} EUR</h5>
             </div>
         </div>
     );
