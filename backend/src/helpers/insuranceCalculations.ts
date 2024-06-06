@@ -5,10 +5,20 @@ import Coverage from '../models/Coverage';
 import Discount from '../models/Discount';
 import { BASE_PRICE_OLD, BASE_PRICE_YOUNG, COVERAGE_AO_PLUS, COVERAGE_BONUS_PROTECTION, COVERAGE_GLASS_PROTECTION, DISCOUNT_ADVISER, DISCOUNT_COMMERCIAL, DISCOUNT_VIP } from '../constants/insurance';
 import BasePrice from '../models/BasePrice';
-import { ICustomer } from '../models/Customer';
 
-export const calculateCoverages = async (selectedCoverages: ICoverage[], basePrice: number, age: number, vehiclePower: number, insuranceSettings: IInsuranceSettings): Promise<number> => {
+export interface IDiscountCalculationResult {
+    totalDiscounts: number;
+    discountAmounts: Record<string, number>;
+}
+
+export interface ICoverageCalculationResult {
+    totalCoverages: number;
+    coverageAmounts: Record<string, number>;
+}
+
+export const calculateCoverages = async (selectedCoverages: ICoverage[], basePrice: number, age: number, vehiclePower: number): Promise<ICoverageCalculationResult> => {
     let totalCoverages = 0;
+    const coverageAmounts: Record<string, number> = {};
     for (const coverageId of selectedCoverages) {
         const coverage: ICoverage | null = await Coverage.findById(coverageId);
         if (!coverage) {
@@ -20,25 +30,31 @@ export const calculateCoverages = async (selectedCoverages: ICoverage[], basePri
                 if (typeof coverage.percentage !== 'number') {
                     throw new Error(`Percentage for coverage '${COVERAGE_BONUS_PROTECTION}' is not defined`);
                 }
-                totalCoverages += basePrice * coverage.percentage;
+                const bonusProtectionCoverageAmount = basePrice * coverage.percentage;
+                totalCoverages += bonusProtectionCoverageAmount;
+                coverageAmounts[COVERAGE_BONUS_PROTECTION] = bonusProtectionCoverageAmount;
                 break;
             case COVERAGE_AO_PLUS:
                 if (typeof coverage.fixedPrice?.old !== 'number' || typeof coverage.fixedPrice?.young !== 'number') {
                     throw new Error(`Fixed price for coverage '${COVERAGE_AO_PLUS}' is not defined`);
                 }
-                totalCoverages += age > 30 ? coverage.fixedPrice.old : coverage.fixedPrice.young;
+                const aoPlusCoverageAmount = age > 30 ? coverage.fixedPrice.old : coverage.fixedPrice.young;
+                totalCoverages += aoPlusCoverageAmount;
+                coverageAmounts[COVERAGE_AO_PLUS] = aoPlusCoverageAmount;
                 break;
             case COVERAGE_GLASS_PROTECTION:
                 if (typeof coverage.percentage !== 'number') {
                     throw new Error(`Percentage for coverage '${COVERAGE_GLASS_PROTECTION}' is not defined`);
                 }
-                totalCoverages += vehiclePower * coverage.percentage;
+                const glassProtectionCoverageAmount = vehiclePower * coverage.percentage;
+                totalCoverages += glassProtectionCoverageAmount;
+                coverageAmounts[COVERAGE_GLASS_PROTECTION] = glassProtectionCoverageAmount;
                 break;
             default:
                 throw new Error(`Invalid coverage name: ${coverage.name}`);
         }
     }
-    return totalCoverages;
+    return { totalCoverages, coverageAmounts };
 };
 
 export const calculateDiscounts = async (
@@ -48,8 +64,9 @@ export const calculateDiscounts = async (
     vehiclePower: number,
     insuranceSettings: IInsuranceSettings,
     numberOfCoveragesSelected: number
-): Promise<number> => {
+): Promise<IDiscountCalculationResult> => {
     let totalDiscounts = 0;
+    const discountAmounts: Record<string, number> = {};
     for (const discount of selectedDiscounts) {
         const discountFromDB = await Discount.findById(discount._id);
         if (discountFromDB) {
@@ -57,22 +74,27 @@ export const calculateDiscounts = async (
             switch (discountFromDB.name) {
                 case DISCOUNT_COMMERCIAL:
                     discountAmount = basePrice * discountFromDB.percentage;
+                    discountAmounts[DISCOUNT_COMMERCIAL] = discountAmount;
                     break;
                 case DISCOUNT_ADVISER:
                     if (numberOfCoveragesSelected >= 2) {
                         discountAmount = totalCoverages * discountFromDB.percentage;
+                        discountAmounts[DISCOUNT_ADVISER] = discountAmount;
                     }
                     break;
                 case DISCOUNT_VIP:
                     if (vehiclePower > insuranceSettings.vipDiscountThreshold) {
                         discountAmount = (basePrice + totalCoverages) * discountFromDB.percentage;
+                        discountAmounts[DISCOUNT_VIP] = discountAmount;
                     }
                     break;
             }
             totalDiscounts += discountAmount;
         }
     }
-    return totalDiscounts;
+
+    console.log({ discountAmounts });
+    return { totalDiscounts, discountAmounts };
 };
 
 export const applySurchargeForStrongCar = (basePrice: number, vehiclePower: number, insuranceSettings: IInsuranceSettings): number => {

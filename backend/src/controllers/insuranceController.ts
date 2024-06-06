@@ -34,8 +34,8 @@ const calculateInsurance = [
             const discounts: IDiscount[] = await Discount.find({ _id: { $in: selectedDiscounts } });
 
             // Calculate total coverages and discounts
-            const totalCoverages = await calculateCoverages(coverages, basePrice, age, vehiclePower, insuranceSettings);
-            const totalDiscounts = await calculateDiscounts(discounts, basePrice, totalCoverages, vehiclePower, insuranceSettings, coverages.length);
+            const { totalCoverages, coverageAmounts } = await calculateCoverages(coverages, basePrice, age, vehiclePower);
+            const { totalDiscounts, discountAmounts } = await calculateDiscounts(discounts, basePrice, totalCoverages, vehiclePower, insuranceSettings, coverages.length);
 
             // Apply voucher
             const voucherDiscount = voucher ? parseFloat(voucher) : 0;
@@ -47,6 +47,8 @@ const calculateInsurance = [
                 basePrice,
                 coverages: selectedCoverages,
                 discounts: selectedDiscounts,
+                discountAmounts,
+                coverageAmounts,
                 totalPrice
             });
         } catch (error) {

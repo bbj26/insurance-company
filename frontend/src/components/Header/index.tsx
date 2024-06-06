@@ -69,7 +69,7 @@ const Header: React.FC = () => {
                 )}
                 <div>
                     <span>
-                        <b>Total Price: {state.priceDetails.totalPrice}</b>
+                        <b>Total Price: {state.priceDetails.totalPrice} EUR</b>
                     </span>
                 </div>
             </div>

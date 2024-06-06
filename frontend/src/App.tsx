@@ -4,6 +4,7 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import { fetchDiscounts, fetchCoverages } from './api';
 import { useStore } from './Store';
+import PriceDetails from './components/PriceDetails';
 
 const App: React.FC = () => {
     const { dispatch } = useStore();
@@ -23,6 +24,7 @@ const App: React.FC = () => {
                 <div className="col-md-4" style={{ backgroundColor: '#e6e6e6' }}>
                     <Sidebar />
                 </div>
+                <PriceDetails />
             </div>
         </div>
     );

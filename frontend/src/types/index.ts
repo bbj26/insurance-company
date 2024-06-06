@@ -13,6 +13,8 @@ export type ICoverage = {
     selected?: boolean;
 };
 
+type IPriceAmount = Record<string, number>;
+
 export type ICustomer = { name: string; birthdate: string; city: string; vehiclePower: number; voucher: number };
 
-export type IPriceDetails = { basePrice: number; totalPrice: number; appliedCoverages: ICoverage[]; appliedDiscounts: IDiscount[] };
+export type IPriceDetails = { basePrice: number; totalPrice: number; appliedCoverages: ICoverage[]; appliedDiscounts: IDiscount[]; discountAmounts: IPriceAmount; coverageAmounts: IPriceAmount };

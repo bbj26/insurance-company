@@ -12,7 +12,7 @@ const initialState: StateType = {
     customer: { name: '', birthdate: '', city: '', vehiclePower: 0, voucher: 0 },
     coverages: [],
     discounts: [],
-    priceDetails: { basePrice: 0, totalPrice: 0, appliedCoverages: [], appliedDiscounts: [] }
+    priceDetails: { basePrice: 0, totalPrice: 0, appliedCoverages: [], appliedDiscounts: [], discountAmounts: {}, coverageAmounts: {} }
 };
 
 export type ActionType =
