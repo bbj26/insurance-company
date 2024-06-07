@@ -93,7 +93,6 @@ export const calculateDiscounts = async (
         }
     }
 
-    console.log({ discountAmounts });
     return { totalDiscounts, discountAmounts };
 };
 
